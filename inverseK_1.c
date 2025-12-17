@@ -9,6 +9,14 @@ struct RobotConfig {
     double elbow;    // Alpha
 };
 
+// Define physical limits for the motors (in radians
+const double BASE_MIN = -95.0 * M_PI / 180.0;
+const double BASE_MAX = 90.0 * M_PI / 180.0;
+const double SHOULDER_MIN = -10.0 * M_PI / 180.0;
+const double SHOULDER_MAX = 110.0 * M_PI / 180.0;
+const double ELBOW_MIN = -170.0 * M_PI / 180.0;
+const double ELBOW_MAX = 170.0 * M_PI / 180.0;
+
 RobotConfig calculate3DIK(double x, double y, double z, double L1, double L2) {
     // 1. Calculate Base Rotation (Phi)
     // This points the arm's "plane" toward the target (x, y)
@@ -27,7 +35,7 @@ RobotConfig calculate3DIK(double x, double y, double z, double L1, double L2) {
 
     // 4. Solve for Elbow Angle (Alpha) using Law of Cosines
     double cosAlpha = (L1 * L1 + L2 * L2 - R * R) / (2 * L1 * L2);
-    double alphaRad = std::acos(cosAlpha);
+    double elbowRad = std::acos(cosAlpha);
 
     // 5. Solve for Shoulder Angle (Theta)
     // Part A: Elevation from ground to target
@@ -39,12 +47,23 @@ RobotConfig calculate3DIK(double x, double y, double z, double L1, double L2) {
 
     // Combine for elbow-down configuration
     double shoulderRad = thetaElevation - thetaInternal;
+    
+    // Check joint limits
+    if (shouderRad < SHOULDER_MIN || shoulderRad > SHOULDER_MAX) {
+        throw std::runtime_error("Target would exceed shoulder limits");
+    }
+    if (elbowRad  < ELBOW_MIN || elbowRad > ELBOW_MAX) {
+        throw std::runtime_error("Target would exceed elbow limits");
+    }
+    if (baseRad   < BASE_MIN || baseRad > BASE_MAX) {
+        throw std::runtime_error("Target would exceed elbow limits");
+    }
 
     // 6. Convert all results to Degrees
     const double radToDeg = 180.0 / M_PI;
     return {
         baseRad * radToDeg,
         shoulderRad * radToDeg,
-        alphaRad * radToDeg
+        elbowRad * radToDeg
     };
 }
