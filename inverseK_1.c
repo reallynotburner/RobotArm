@@ -9,13 +9,15 @@ struct RobotConfig {
     double elbow;    // Alpha
 };
 
+const double degToRad = M_PI / 180.0;
+
 // Define physical limits for the motors (in radians
-const double BASE_MIN = -95.0 * M_PI / 180.0;
-const double BASE_MAX = 90.0 * M_PI / 180.0;
-const double SHOULDER_MIN = -10.0 * M_PI / 180.0;
-const double SHOULDER_MAX = 110.0 * M_PI / 180.0;
-const double ELBOW_MIN = -170.0 * M_PI / 180.0;
-const double ELBOW_MAX = 170.0 * M_PI / 180.0;
+const double BASE_MIN = -95.0 * degToRad;
+const double BASE_MAX = 90.0 * degToRad;
+const double SHOULDER_MIN = degToRad;
+const double SHOULDER_MAX = degToRad;
+const double ELBOW_MIN = degToRad;
+const double ELBOW_MAX = degToRad;
 
 RobotConfig calculate3DIK(double x, double y, double z, double L1, double L2) {
     // 1. Calculate Base Rotation (Phi)
